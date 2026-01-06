@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CyberWatch Icon Generator</title>
+  <style>
+    body {
+      font-family: system-ui;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px;
+      background: white;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #000;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CyberWatch Favicon Generator</h1>
+    <p>Click the buttons below to download different icon sizes:</p>
+    
+    <div id="canvases"></div>
+    
+    <div style="margin-top: 20px;">
+      <button onclick="downloadIcon(16)">Download 16x16</button>
+      <button onclick="downloadIcon(32)">Download 32x32</button>
+      <button onclick="downloadIcon(48)">Download 48x48</button>
+      <button onclick="downloadIcon(180)">Download 180x180 (Apple)</button>
+      <button onclick="downloadIcon(192)">Download 192x192 (Android)</button>
+      <button onclick="downloadIcon(512)">Download 512x512 (PWA)</button>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+      
+      // Background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, size, size);
+      
+      // Scale factor
+      const scale = size / 64;
+      
+      // Shield path
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2.5 * scale;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(32 * scale, 12 * scale);
+      ctx.lineTo(20 * scale, 18 * scale);
+      ctx.lineTo(20 * scale, 28 * scale);
+      ctx.bezierCurveTo(
+        20 * scale, 36 * scale,
+        24 * scale, 42 * scale,
+        32 * scale, 48 * scale
+      );
+      ctx.bezierCurveTo(
+        40 * scale, 42 * scale,
+        44 * scale, 36 * scale,
+        44 * scale, 28 * scale
+      );
+      ctx.lineTo(44 * scale, 18 * scale);
+      ctx.closePath();
+      ctx.stroke();
+      
+      // Inner shield
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.beginPath();
+      ctx.moveTo(32 * scale, 16 * scale);
+      ctx.lineTo(24 * scale, 20 * scale);
+      ctx.lineTo(24 * scale, 28 * scale);
+      ctx.bezierCurveTo(
+        24 * scale, 34 * scale,
+        27 * scale, 39 * scale,
+        32 * scale, 43 * scale
+      );
+      ctx.bezierCurveTo(
+        37 * scale, 39 * scale,
+        40 * scale, 34 * scale,
+        40 * scale, 28 * scale
+      );
+      ctx.lineTo(40 * scale, 20 * scale);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Lock body
+      ctx.fillStyle = '#FFFFFF';
+      const lockX = 28 * scale;
+      const lockY = 28 * scale;
+      const lockW = 8 * scale;
+      const lockH = 8 * scale;
+      const radius = 1 * scale;
+      
+      ctx.beginPath();
+      ctx.moveTo(lockX + radius, lockY);
+      ctx.lineTo(lockX + lockW - radius, lockY);
+      ctx.quadraticCurveTo(lockX + lockW, lockY, lockX + lockW, lockY + radius);
+      ctx.lineTo(lockX + lockW, lockY + lockH - radius);
+      ctx.quadraticCurveTo(lockX + lockW, lockY + lockH, lockX + lockW - radius, lockY + lockH);
+      ctx.lineTo(lockX + radius, lockY + lockH);
+      ctx.quadraticCurveTo(lockX, lockY + lockH, lockX, lockY + lockH - radius);
+      ctx.lineTo(lockX, lockY + radius);
+      ctx.quadraticCurveTo(lockX, lockY, lockX + radius, lockY);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Lock arc
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2 * scale;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(32 * scale, 25 * scale, 3 * scale, Math.PI, 0, true);
+      ctx.stroke();
+      
+      // Keyhole
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(32 * scale, 32 * scale, 1.5 * scale, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    function downloadIcon(size) {
+      const canvas = document.createElement('canvas');
+      drawIcon(canvas, size);
+      
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon-${size}x${size}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+    
+    // Preview canvases
+    const sizes = [16, 32, 48, 64];
+    const container = document.getElementById('canvases');
+    sizes.forEach(size => {
+      const canvas = document.createElement('canvas');
+      drawIcon(canvas, size);
+      container.appendChild(canvas);
+    });
+  </script>
+</body>
+</html>
+

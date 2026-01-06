@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:icons": "node scripts/generate-icons.js",
+    "generate:icons:browser": "open scripts/generate-icons.html"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -27,7 +29,7 @@
     "react-dom": "19.2.3",
     "rss-parser": "^3.13.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.5"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

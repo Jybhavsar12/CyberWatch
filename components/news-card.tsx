@@ -4,6 +4,7 @@ import { ArticleComments } from '@/components/article-comments'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 import { formatDistanceToNow } from 'date-fns'
 import { ArrowUpRight, Clock } from 'lucide-react'
 
@@ -19,19 +20,27 @@ interface NewsCardProps {
     published_at: string
     tags: string[]
   }
+  index?: number
 }
 
-export function NewsCard({ article }: NewsCardProps) {
+export function NewsCard({ article, index = 0 }: NewsCardProps) {
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 })
+
   return (
-    <Card className="flex flex-col h-full border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 transition-all duration-300 bg-white dark:bg-black group">
+    <div
+      ref={ref}
+      className={`animate-on-scroll ${isVisible ? 'animate-fade-in-up' : ''}`}
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <Card className="flex flex-col h-full border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 transition-all duration-300 bg-white dark:bg-black group hover:shadow-xl hover:-translate-y-1 transform">
       {article.image_url && (
         <div className="relative h-48 w-full overflow-hidden">
           <img
             src={article.image_url}
             alt={article.title}
-            className="object-cover w-full h-full grayscale group-hover:grayscale-0 transition-all duration-500"
+            className="object-cover w-full h-full grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 ease-out"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 dark:from-white/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       )}
       <CardHeader className="space-y-3">
@@ -93,6 +102,7 @@ export function NewsCard({ article }: NewsCardProps) {
         <ArticleComments articleUrl={article.url} />
       </CardFooter>
     </Card>
+    </div>
   )
 }
 

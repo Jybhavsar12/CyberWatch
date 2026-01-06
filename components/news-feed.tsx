@@ -79,16 +79,16 @@ export function NewsFeed() {
         <div className="flex gap-2">
           <Button
             onClick={handleSearch}
-            className="h-12 px-6 bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 font-medium tracking-wide"
+            className="h-12 px-6 bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 font-medium tracking-wide transition-all duration-300 hover:scale-105 hover:shadow-lg"
           >
             SEARCH
           </Button>
           <Button
             variant="outline"
             onClick={fetchNews}
-            className="h-12 px-4 border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5"
+            className="h-12 px-4 border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 hover:scale-105 hover:rotate-180"
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="h-4 w-4 transition-transform duration-300" />
           </Button>
         </div>
       </div>
@@ -121,15 +121,20 @@ export function NewsFeed() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-96 bg-black/5 dark:bg-white/5 animate-pulse border border-black/10 dark:border-white/10" />
+            <div
+              key={i}
+              className="h-96 bg-black/5 dark:bg-white/5 animate-shimmer border border-black/10 dark:border-white/10 rounded-lg overflow-hidden"
+              style={{ animationDelay: `${i * 100}ms` }}
+            />
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {articles.map((article) => (
+          {articles.map((article, index) => (
             <NewsCard
               key={article.id}
               article={article}
+              index={index % 3}
             />
           ))}
         </div>
