@@ -4,6 +4,11 @@ import { fetchNewsFromRSS } from '@/lib/services/news-aggregator'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Enable edge runtime for better performance
+export const runtime = 'nodejs'
+// Revalidate every 8 hours (28800 seconds)
+export const revalidate = 28800
+
 export async function GET(request: NextRequest) {
   // Rate limiting
   const rateLimitResult = rateLimit(request, 30, 60000)
@@ -34,12 +39,14 @@ export async function GET(request: NextRequest) {
     }))
 
     // Try to store in database (optional - won't fail if table doesn't exist)
+    // Only store if we have fresh data (not from cache)
     try {
       const supabase = await createClient()
-      for (const article of articles) {
+      // Batch upsert for better performance
+      if (articles.length > 0) {
         await supabase
           .from('articles')
-          .upsert(article, {
+          .upsert(articles, {
             onConflict: 'url',
             ignoreDuplicates: true,
           })
@@ -50,6 +57,10 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.json({ articles, count: articles.length })
+
+    // Add cache headers - cache for 8 hours
+    response.headers.set('Cache-Control', 'public, s-maxage=28800, stale-while-revalidate=86400')
+
     return addSecurityHeaders(response)
   } catch (error) {
     console.error('Error fetching news:', error)

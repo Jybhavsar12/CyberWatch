@@ -4,6 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { searchQuerySchema } from '@/lib/validations/article'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Cache search results for 1 hour
+export const revalidate = 3600
+
 export async function GET(request: NextRequest) {
   // Rate limiting
   const rateLimitResult = rateLimit(request, 20, 60000)
@@ -45,6 +48,10 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.json({ articles, count: articles?.length || 0 })
+
+    // Add cache headers - cache for 1 hour
+    response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200')
+
     return addSecurityHeaders(response)
   } catch (error) {
     console.error('Error searching news:', error)

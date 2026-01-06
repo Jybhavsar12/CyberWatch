@@ -3,9 +3,8 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/client'
 import { Filter, RefreshCw, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { NewsCard } from './news-card'
 
 interface Article {
@@ -26,7 +25,7 @@ export function NewsFeed() {
   const [searchQuery, setSearchQuery] = useState('')
   const [category, setCategory] = useState<'all' | 'tech' | 'cybersecurity'>('all')
 
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/news?category=${category}&limit=30`)
@@ -37,9 +36,9 @@ export function NewsFeed() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [category])
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
       fetchNews()
       return
@@ -57,11 +56,11 @@ export function NewsFeed() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, category, fetchNews])
 
   useEffect(() => {
     fetchNews()
-  }, [category])
+  }, [fetchNews])
 
   return (
     <div className="space-y-8">
@@ -95,7 +94,7 @@ export function NewsFeed() {
       </div>
 
       {/* Category Tabs */}
-      <Tabs value={category} onValueChange={(v) => setCategory(v as any)}>
+      <Tabs value={category} onValueChange={(v) => setCategory(v as 'all' | 'tech' | 'cybersecurity')}>
         <TabsList className="grid w-full md:w-auto md:inline-grid grid-cols-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 p-1">
           <TabsTrigger
             value="all"
