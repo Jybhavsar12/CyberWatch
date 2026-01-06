@@ -1,4 +1,4 @@
-# 🛡️ CyberWatch - Tech & Cybersecurity News Platform
+# CyberWatch - Tech & Cybersecurity News Platform
 
 A modern, secure, full-stack news aggregation platform built with Next.js 14+, featuring real-time tech and cybersecurity news from trusted sources worldwide.
 
@@ -7,20 +7,20 @@ A modern, secure, full-stack news aggregation platform built with Next.js 14+, f
 ![Supabase](https://img.shields.io/badge/Supabase-Database-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-## ✨ Features
+## Features
 
-### 📰 News Aggregation
+### News Aggregation
 - **Real-time Updates**: Fetch latest news from multiple RSS feeds
 - **Dual Categories**: Tech and Cybersecurity news streams
 - **Smart Search**: Full-text search across articles
 - **Source Attribution**: Track news from TechCrunch, The Hacker News, Bleeping Computer, and more
 
-### � Community Features
+### Community Features
 - **Article Comments**: Engage with other readers on any article
 - **Newsletter Subscription**: Subscribe to receive curated news via email
 - **User Authentication**: Secure login and signup with Supabase Auth
 
-### �🔐 Security Features
+### Security Features
 - **Rate Limiting**: Prevent API abuse with configurable limits
 - **CORS Protection**: Secure cross-origin resource sharing
 - **Security Headers**: CSP, XSS protection, frame options
@@ -28,19 +28,19 @@ A modern, secure, full-stack news aggregation platform built with Next.js 14+, f
 - **Input Validation**: Zod schema validation for all inputs
 - **API Key Authentication**: Optional API key protection
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Beautiful Components**: shadcn/ui component library
 - **Dark Mode Ready**: Theme support built-in
 - **Smooth Animations**: Polished user experience
 
-### 🚀 Performance
+### Performance
 - **Server Components**: React Server Components for optimal performance
 - **Edge Functions**: Deploy to Vercel Edge Network
 - **Optimized Images**: Next.js Image optimization
 - **Caching Strategy**: Smart caching for better performance
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 14+ (App Router)
 - **Language**: TypeScript
@@ -52,14 +52,14 @@ A modern, secure, full-stack news aggregation platform built with Next.js 14+, f
 - **News Parsing**: rss-parser
 - **Deployment**: Vercel
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+
 - npm or yarn
 - Supabase account (free tier available)
 - Git
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 
@@ -108,7 +108,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 🌐 Deployment to Vercel & GitHub
+## Deployment to Vercel & GitHub
 
 ### Step 1: Push to GitHub
 
@@ -136,7 +136,7 @@ git push -u origin main
 2. Add your custom domain
 3. Follow DNS configuration instructions
 
-## 🔒 Security Configuration
+## Security Configuration
 
 ### Rate Limiting
 
@@ -160,7 +160,7 @@ All responses include:
 - User-specific data isolation
 - Secure authentication with Supabase Auth
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 cyberwatch/
@@ -202,7 +202,7 @@ npm run start        # Start production server
 npm run lint         # Run ESLint
 ```
 
-## 📊 API Endpoints
+## API Endpoints
 
 ### GET /api/news
 Fetch latest news articles
@@ -216,7 +216,7 @@ Search articles
 Subscribe to newsletter
 - Body: `{ email: string }`
 
-## 🎯 News Sources
+## News Sources
 
 ### Tech News
 - TechCrunch
@@ -231,25 +231,25 @@ Subscribe to newsletter
 - Threatpost
 - Dark Reading
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Next.js team for the amazing framework
 - Supabase for the backend infrastructure
 - shadcn for the beautiful UI components
 - All the news sources for providing RSS feeds
 
-## 📞 Support
+## Support
 
 For issues and questions, please open an issue on GitHub.
 
 ---
 
-Built with ❤️ using Next.js, TypeScript, and Supabase
+Built using Next.js, TypeScript, and Supabase
