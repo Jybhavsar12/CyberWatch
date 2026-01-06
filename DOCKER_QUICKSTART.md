@@ -12,7 +12,7 @@ Get CyberWatch running in 3 minutes with Docker!
 
 ```bash
 git clone https://github.com/Jybhavsar12/CyberWatch.git
-cd CyberWatch/cyberwatch
+cd CyberWatch
 ```
 
 ## Step 2: Configure Environment

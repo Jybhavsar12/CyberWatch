@@ -72,7 +72,7 @@ The easiest way to run CyberWatch is using Docker. See [DOCKER.md](DOCKER.md) fo
 
 ```bash
 git clone https://github.com/Jybhavsar12/CyberWatch.git
-cd CyberWatch/cyberwatch
+cd CyberWatch
 
 # Configure environment
 cp .env.production.example .env.production
@@ -90,7 +90,7 @@ Application will be available at `http://localhost:3000`
 
 ```bash
 git clone https://github.com/Jybhavsar12/CyberWatch.git
-cd CyberWatch/cyberwatch
+cd CyberWatch
 ```
 
 ### 2. Install Dependencies

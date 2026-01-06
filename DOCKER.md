@@ -14,7 +14,7 @@ This guide explains how to run CyberWatch using Docker for a consistent, portabl
 
 ```bash
 git clone https://github.com/Jybhavsar12/CyberWatch.git
-cd CyberWatch/cyberwatch
+cd CyberWatch
 ```
 
 ### 2. Configure Environment Variables
