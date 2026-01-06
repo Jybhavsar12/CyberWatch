@@ -5,6 +5,7 @@ A modern, secure, full-stack news aggregation platform built with Next.js 14+, f
 ![Next.js](https://img.shields.io/badge/Next.js-14+-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)
 ![Supabase](https://img.shields.io/badge/Supabase-Database-green)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ## Features
@@ -61,11 +62,35 @@ A modern, secure, full-stack news aggregation platform built with Next.js 14+, f
 
 ## Getting Started
 
-### 1. Clone the Repository
+Choose your preferred deployment method:
+
+### Option 1: Docker (Recommended)
+
+The easiest way to run CyberWatch is using Docker. See [DOCKER.md](DOCKER.md) for detailed instructions.
+
+**Quick Start:**
 
 ```bash
 git clone https://github.com/Jybhavsar12/CyberWatch.git
-cd CyberWatch
+cd CyberWatch/cyberwatch
+
+# Configure environment
+cp .env.production.example .env.production
+# Edit .env.production with your Supabase credentials
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+Application will be available at `http://localhost:3000`
+
+### Option 2: Local Development
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Jybhavsar12/CyberWatch.git
+cd CyberWatch/cyberwatch
 ```
 
 ### 2. Install Dependencies
@@ -195,12 +220,26 @@ cyberwatch/
 
 ## 🔧 Available Scripts
 
+### Local Development
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
 npm run start        # Start production server
 npm run lint         # Run ESLint
 ```
+
+### Docker Commands
+```bash
+make build           # Build Docker image
+make up              # Start containers
+make down            # Stop containers
+make logs            # View logs
+make shell           # Open shell in container
+make health          # Check application health
+make rebuild         # Rebuild and restart
+```
+
+See [DOCKER.md](DOCKER.md) for complete Docker documentation.
 
 ## API Endpoints
 
