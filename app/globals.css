@@ -269,3 +269,84 @@
   );
   background-size: 1000px 100%;
 }
+
+/* Custom Cursor Animation */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.15s ease-out;
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  border: 2px solid white;
+  border-radius: 50%;
+  transition: transform 0.25s ease-out;
+}
+
+/* Hide default cursor on desktop */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+
+  a, button, [role="button"], input, textarea, select {
+    cursor: none;
+  }
+}
+
+/* Pulse animation for cursor */
+@keyframes cursorPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.cursor-dot {
+  animation: cursorPulse 2s ease-in-out infinite;
+}
+
+/* Cursor Trail */
+.cursor-trail-point {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.dark .cursor-trail-point {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Enhanced cursor for interactive elements */
+@media (hover: hover) and (pointer: fine) {
+  a:hover ~ .cursor-ring,
+  button:hover ~ .cursor-ring,
+  [role="button"]:hover ~ .cursor-ring {
+    border-color: #667eea;
+  }
+
+  .dark a:hover ~ .cursor-ring,
+  .dark button:hover ~ .cursor-ring,
+  .dark [role="button"]:hover ~ .cursor-ring {
+    border-color: #f093fb;
+  }
+}

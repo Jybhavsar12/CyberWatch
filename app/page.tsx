@@ -1,5 +1,6 @@
 'use client'
 
+import { Floating, Parallax } from '@/components/animations';
 import { NewsFeed } from '@/components/news-feed';
 import { NewsletterSignup } from '@/components/newsletter-signup';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -95,17 +96,41 @@ export default function Home() {
       {/* Hero Section */}
       <section
         ref={heroAnimation.ref}
-        className="bg-black dark:bg-white text-white dark:text-black py-20 border-b border-white/10 dark:border-black/10 overflow-hidden"
+        className="bg-black dark:bg-white text-white dark:text-black py-20 border-b border-white/10 dark:border-black/10 overflow-hidden relative"
       >
-        <div className="container mx-auto px-6">
+        {/* Parallax Background Elements */}
+        <Parallax speed={-3} className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-purple-500/10 dark:bg-purple-500/5 rounded-full blur-3xl" />
+        </Parallax>
+        <Parallax speed={-2} className="absolute inset-0 pointer-events-none">
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-3xl" />
+        </Parallax>
+
+        {/* Floating Decorative Elements */}
+        <Floating duration={4} yOffset={15} className="absolute top-10 right-20 pointer-events-none hidden lg:block">
+          <Shield className="h-16 w-16 text-white/10 dark:text-black/10" strokeWidth={1} />
+        </Floating>
+        <Floating duration={5} yOffset={20} className="absolute bottom-10 left-20 pointer-events-none hidden lg:block">
+          <Lock className="h-12 w-12 text-white/10 dark:text-black/10" strokeWidth={1} />
+        </Floating>
+        <Floating duration={3.5} yOffset={12} className="absolute top-1/2 right-40 pointer-events-none hidden xl:block">
+          <Zap className="h-10 w-10 text-white/10 dark:text-black/10" strokeWidth={1} />
+        </Floating>
+
+        <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl">
             <div className={`flex items-center gap-2 mb-6 animate-on-scroll ${heroAnimation.isVisible ? 'animate-slide-in-left' : ''}`}>
               <div className="h-px w-12 bg-white/40 dark:bg-black/40"></div>
               <span className="text-xs tracking-widest text-white/60 dark:text-black/60 uppercase">Real-Time Intelligence</span>
             </div>
-            <h2 className={`text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-tight animate-on-scroll ${heroAnimation.isVisible ? 'animate-fade-in-up animation-delay-100' : ''}`}>
-              Stay Ahead of the<br />Digital Frontier
-            </h2>
+
+            {/* Floating Title */}
+            <Floating duration={6} yOffset={8}>
+              <h2 className={`text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-tight animate-on-scroll ${heroAnimation.isVisible ? 'animate-fade-in-up animation-delay-100' : ''}`}>
+                Stay Ahead of the<br />Digital Frontier
+              </h2>
+            </Floating>
+
             <p className={`text-lg text-white/70 dark:text-black/70 max-w-2xl leading-relaxed animate-on-scroll ${heroAnimation.isVisible ? 'animate-fade-in-up animation-delay-200' : ''}`}>
               Curated technology and cybersecurity intelligence from the world's most trusted sources.
               Real-time updates, zero noise.
@@ -129,12 +154,19 @@ export default function Home() {
       </section>
 
       {/* Main Content */}
-      <main ref={feedAnimation.ref} className="container mx-auto px-6 py-12">
-        <div className={`mb-8 animate-on-scroll ${feedAnimation.isVisible ? 'animate-fade-in-up' : ''}`}>
+      <main ref={feedAnimation.ref} className="container mx-auto px-6 py-12 relative">
+        {/* Parallax Background for Main Content */}
+        <Parallax speed={1} className="absolute top-40 -left-20 pointer-events-none">
+          <div className="w-72 h-72 bg-gradient-to-br from-purple-500/5 to-blue-500/5 dark:from-purple-500/3 dark:to-blue-500/3 rounded-full blur-3xl" />
+        </Parallax>
+
+        <div className={`mb-8 animate-on-scroll ${feedAnimation.isVisible ? 'animate-fade-in-up' : ''} relative z-10`}>
           <h3 className="text-xs tracking-widest text-black/40 dark:text-white/40 uppercase mb-2">Latest Intelligence</h3>
           <div className="h-px bg-black/10 dark:bg-white/10"></div>
         </div>
-        <NewsFeed />
+        <div className="relative z-10">
+          <NewsFeed />
+        </div>
       </main>
 
       {/* Newsletter Signup */}

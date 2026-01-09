@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
-  output: 'standalone', // Enable standalone output for Docker
+  // Disable React Compiler in development for faster startup
+  reactCompiler: process.env.NODE_ENV === 'production',
+
+  // Only use standalone output for production builds
+  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
+
   images: {
     remotePatterns: [
       {

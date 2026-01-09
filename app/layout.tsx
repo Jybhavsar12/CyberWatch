@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import { CursorAnimation } from "@/components/cursor-animation";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -41,6 +42,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <CursorAnimation />
           {children}
         </ThemeProvider>
       </body>
