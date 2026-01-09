@@ -1,13 +1,16 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shield, Newspaper, Mail, Lock, ArrowRight } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { createClient } from '@/lib/supabase/client'
+import { ArrowRight, Lock, Mail, Newspaper, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+// Force dynamic rendering (no static generation)
+export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
