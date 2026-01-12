@@ -15,11 +15,21 @@ export async function GET(request: NextRequest) {
 
     // Check if user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+
     if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in to access this page' },
         { status: 401 }
+      )
+    }
+
+    // Check if user is admin (whitelist check)
+    const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim().toLowerCase()) || []
+
+    if (!adminEmails.includes(user.email?.toLowerCase() || '')) {
+      return NextResponse.json(
+        { error: 'Forbidden - Admin access only' },
+        { status: 403 }
       )
     }
 

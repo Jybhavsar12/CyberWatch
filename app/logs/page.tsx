@@ -35,14 +35,20 @@ export default function LogsPage() {
     setError('')
     try {
       const response = await fetch('/api/admin/users')
-      
+
       if (response.status === 401) {
         setError('Please sign in to access this page')
         return
       }
 
+      if (response.status === 403) {
+        setError('Access Denied - Admin privileges required')
+        return
+      }
+
       if (!response.ok) {
-        throw new Error('Failed to fetch data')
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to fetch data')
       }
 
       const result = await response.json()
