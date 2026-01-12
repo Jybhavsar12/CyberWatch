@@ -1,19 +1,17 @@
 'use client'
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Shield, Newspaper, Mail, Check, Zap, Lock, TrendingUp } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Check, Lock, Mail, Newspaper, Shield, TrendingUp, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export default function SubscribePage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
-  const supabase = createClient()
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,16 +19,17 @@ export default function SubscribePage() {
     setError('')
 
     try {
-      // Insert into subscribers table
-      const { error } = await supabase
-        .from('subscribers')
-        .insert([{ email, subscribed_at: new Date().toISOString() }])
+      // Use the newsletter API endpoint instead of direct database access
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
 
-      if (error) {
-        if (error.code === '23505') {
-          throw new Error('This email is already subscribed!')
-        }
-        throw error
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to subscribe')
       }
 
       setSuccess(true)
