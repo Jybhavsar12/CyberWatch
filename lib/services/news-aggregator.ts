@@ -38,7 +38,7 @@ const RSS_FEEDS = {
 export async function fetchNewsFromRSS(
   category: 'tech' | 'cybersecurity' | 'all' = 'all'
 ): Promise<NewsItem[]> {
-  // Check cache first - returns data if less than 8 hours old
+  // Check cache first - returns data if less than 5 minutes old
   const cachedNews = getCachedNews(category)
   if (cachedNews) {
     console.log(`Returning cached news for ${category}`)
@@ -95,7 +95,7 @@ export async function fetchNewsFromRSS(
   // Sort by published date (newest first)
   const sortedNews = allNews.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
 
-  // Cache the results for 8 hours
+  // Cache the results for 5 minutes
   setCachedNews(category, sortedNews)
 
   return sortedNews

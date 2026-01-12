@@ -24,19 +24,31 @@ export function NewsFeed() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [category, setCategory] = useState<'all' | 'tech' | 'cybersecurity'>('all')
+  const [refreshing, setRefreshing] = useState(false)
 
-  const fetchNews = useCallback(async () => {
+  const fetchNews = useCallback(async (forceRefresh = false) => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/news?category=${category}&limit=30`)
+      // Add cache-busting parameter when force refreshing
+      const cacheBuster = forceRefresh ? `&t=${Date.now()}` : ''
+      const response = await fetch(`/api/news?category=${category}&limit=30${cacheBuster}`, {
+        // Force no-cache when refreshing
+        cache: forceRefresh ? 'no-store' : 'default'
+      })
       const data = await response.json()
       setArticles(data.articles || [])
     } catch (error) {
       console.error('Error fetching news:', error)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }, [category])
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await fetchNews(true)
+  }, [fetchNews])
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) {
@@ -85,10 +97,12 @@ export function NewsFeed() {
           </Button>
           <Button
             variant="outline"
-            onClick={fetchNews}
-            className="h-12 px-4 border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 hover:scale-105 hover:rotate-180"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="h-12 px-4 border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 hover:scale-105 disabled:opacity-50"
+            title="Refresh news"
           >
-            <RefreshCw className="h-4 w-4 transition-transform duration-300" />
+            <RefreshCw className={`h-4 w-4 transition-transform duration-300 ${refreshing ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>

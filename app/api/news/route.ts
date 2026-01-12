@@ -6,8 +6,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Enable edge runtime for better performance
 export const runtime = 'nodejs'
-// Revalidate every 8 hours (28800 seconds)
-export const revalidate = 28800
+// Revalidate every 5 minutes (300 seconds) for fresher content
+export const revalidate = 300
+// Disable static generation to ensure dynamic data fetching
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   // Rate limiting
@@ -58,8 +60,9 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json({ articles, count: articles.length })
 
-    // Add cache headers - cache for 8 hours
-    response.headers.set('Cache-Control', 'public, s-maxage=28800, stale-while-revalidate=86400')
+    // Add cache headers - cache for 5 minutes with stale-while-revalidate
+    // This allows fresh content on refresh while maintaining performance
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600, must-revalidate')
 
     return addSecurityHeaders(response)
   } catch (error) {

@@ -6,8 +6,8 @@ interface CacheEntry {
   category: 'tech' | 'cybersecurity' | 'all'
 }
 
-// In-memory cache with 8-hour TTL
-const CACHE_TTL = 8 * 60 * 60 * 1000 // 8 hours in milliseconds
+// In-memory cache with 5-minute TTL for fresher content
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes in milliseconds
 const cache = new Map<string, CacheEntry>()
 
 export function getCachedNews(category: 'tech' | 'cybersecurity' | 'all'): NewsItem[] | null {
@@ -21,14 +21,14 @@ export function getCachedNews(category: 'tech' | 'cybersecurity' | 'all'): NewsI
   const now = Date.now()
   const age = now - cached.timestamp
 
-  // Check if cache is still valid (less than 8 hours old)
+  // Check if cache is still valid (less than 5 minutes old)
   if (age < CACHE_TTL) {
-    console.log(`Cache hit for ${category} - Age: ${Math.round(age / 1000 / 60)} minutes`)
+    console.log(`Cache hit for ${category} - Age: ${Math.round(age / 1000)} seconds`)
     return cached.data
   }
 
   // Cache expired, remove it
-  console.log(`Cache expired for ${category} - Age: ${Math.round(age / 1000 / 60)} minutes`)
+  console.log(`Cache expired for ${category} - Age: ${Math.round(age / 1000)} seconds`)
   cache.delete(cacheKey)
   return null
 }

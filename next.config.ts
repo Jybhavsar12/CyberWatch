@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   // Only use standalone output for production builds
   ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
 
+  // Skip type checking in dev (use editor instead)
+  typescript: {
+    ignoreBuildErrors: process.env.NODE_ENV === 'development',
+  },
+
   images: {
     remotePatterns: [
       {
