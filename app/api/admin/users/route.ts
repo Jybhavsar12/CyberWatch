@@ -1,6 +1,6 @@
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -33,11 +33,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Fetch authenticated users from auth.users (metadata only, not sensitive data)
-    const { data: authUsers, error: usersError } = await supabase
+    // Use admin client to fetch all users
+    const adminClient = createAdminClient()
+
+    // Fetch authenticated users from Supabase Auth (using admin API)
+    const { data: { users: authUsers }, error: usersError } = await adminClient.auth.admin.listUsers()
+
+    // Fetch user preferences
+    const { data: userPreferences, error: prefsError } = await supabase
       .from('user_preferences')
       .select('*')
-      .order('created_at', { ascending: false })
 
     // Fetch newsletter subscribers
     const { data: subscribers, error: subscribersError } = await supabase
@@ -52,12 +57,25 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(100)
 
+    // Combine auth users with their preferences
+    const usersWithPreferences = authUsers?.map(authUser => {
+      const prefs = userPreferences?.find(p => p.user_id === authUser.id)
+      return {
+        id: authUser.id,
+        email: authUser.email,
+        created_at: authUser.created_at,
+        last_sign_in_at: authUser.last_sign_in_at,
+        email_confirmed_at: authUser.email_confirmed_at,
+        preferences: prefs || null
+      }
+    }) || []
+
     const response = NextResponse.json({
-      authUsers: authUsers || [],
+      authUsers: usersWithPreferences,
       subscribers: subscribers || [],
       recentActivity: comments || [],
       stats: {
-        totalAuthUsers: authUsers?.length || 0,
+        totalAuthUsers: usersWithPreferences.length,
         totalSubscribers: subscribers?.length || 0,
         activeSubscribers: subscribers?.filter(s => s.active).length || 0,
         recentComments: comments?.length || 0,

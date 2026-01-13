@@ -250,21 +250,34 @@ export default function LogsPage() {
                       <table className="w-full">
                         <thead>
                           <tr className="border-b border-black/10 dark:border-white/10">
-                            <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">User ID</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">Email</th>
                             <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">Categories</th>
                             <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">Notifications</th>
+                            <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">Last Sign In</th>
                             <th className="text-left py-3 px-4 text-sm font-medium text-black/60 dark:text-white/60">Created</th>
                           </tr>
                         </thead>
                         <tbody>
                           {data.authUsers.map((user: any) => (
                             <tr key={user.id} className="border-b border-black/5 dark:border-white/5">
-                              <td className="py-3 px-4 text-xs text-black dark:text-white font-mono">{user.user_id.substring(0, 8)}...</td>
-                              <td className="py-3 px-4 text-sm text-black/60 dark:text-white/60">{user.categories?.join(', ') || 'N/A'}</td>
+                              <td className="py-3 px-4 text-sm text-black dark:text-white">
+                                <div className="flex flex-col">
+                                  <span>{user.email}</span>
+                                  {user.email_confirmed_at && (
+                                    <span className="text-xs text-green-600 dark:text-green-400">✓ Verified</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-sm text-black/60 dark:text-white/60">
+                                {user.preferences?.categories?.join(', ') || 'Not set'}
+                              </td>
                               <td className="py-3 px-4">
-                                <span className={`text-xs px-2 py-1 rounded ${user.notification_enabled ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'}`}>
-                                  {user.notification_enabled ? 'Enabled' : 'Disabled'}
+                                <span className={`text-xs px-2 py-1 rounded ${user.preferences?.notification_enabled ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-gray-500/10 text-gray-600 dark:text-gray-400'}`}>
+                                  {user.preferences?.notification_enabled ? 'Enabled' : 'Disabled'}
                                 </span>
+                              </td>
+                              <td className="py-3 px-4 text-sm text-black/60 dark:text-white/60">
+                                {user.last_sign_in_at ? formatDistanceToNow(new Date(user.last_sign_in_at), { addSuffix: true }) : 'Never'}
                               </td>
                               <td className="py-3 px-4 text-sm text-black/60 dark:text-white/60">
                                 {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
