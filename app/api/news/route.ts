@@ -1,7 +1,7 @@
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
 import { fetchNewsFromRSS } from '@/lib/services/news-aggregator'
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db/neon'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Enable edge runtime for better performance
@@ -43,15 +43,23 @@ export async function GET(request: NextRequest) {
     // Try to store in database (optional - won't fail if table doesn't exist)
     // Only store if we have fresh data (not from cache)
     try {
-      const supabase = await createClient()
       // Batch upsert for better performance
       if (articles.length > 0) {
-        await supabase
-          .from('articles')
-          .upsert(articles, {
-            onConflict: 'url',
-            ignoreDuplicates: true,
-          })
+        for (const article of articles) {
+          await sql`
+            INSERT INTO articles (
+              title, description, content, url, image_url, source,
+              category, published_at, author, tags
+            )
+            VALUES (
+              ${article.title}, ${article.description}, ${article.content},
+              ${article.url}, ${article.imageUrl}, ${article.source},
+              ${article.category}, ${article.publishedAt}, ${article.author},
+              ${article.tags}
+            )
+            ON CONFLICT (url) DO NOTHING
+          `
+        }
       }
     } catch (dbError) {
       // Database storage is optional - continue even if it fails

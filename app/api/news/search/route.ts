@@ -1,6 +1,6 @@
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db/neon'
 import { searchQuerySchema } from '@/lib/validations/article'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -28,23 +28,23 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
-    
-    let queryBuilder = supabase
-      .from('articles')
-      .select('*')
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-      .order('published_at', { ascending: false })
-      .limit(50)
-
+    // Build SQL query
+    let articles
     if (category && category !== 'all') {
-      queryBuilder = queryBuilder.eq('category', category)
-    }
-
-    const { data: articles, error } = await queryBuilder
-
-    if (error) {
-      throw error
+      articles = await sql`
+        SELECT * FROM articles
+        WHERE (title ILIKE ${'%' + query + '%'} OR description ILIKE ${'%' + query + '%'})
+        AND category = ${category}
+        ORDER BY published_at DESC
+        LIMIT 50
+      `
+    } else {
+      articles = await sql`
+        SELECT * FROM articles
+        WHERE title ILIKE ${'%' + query + '%'} OR description ILIKE ${'%' + query + '%'}
+        ORDER BY published_at DESC
+        LIMIT 50
+      `
     }
 
     const response = NextResponse.json({ articles, count: articles?.length || 0 })

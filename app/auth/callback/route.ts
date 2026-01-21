@@ -1,17 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+// NextAuth handles OAuth callbacks automatically at /api/auth/callback/[provider]
+// This route is kept for backward compatibility and redirects to home
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get('code')
   const origin = requestUrl.origin
 
-  if (code) {
-    const supabase = await createClient()
-    await supabase.auth.exchangeCodeForSession(code)
-  }
-
-  // URL to redirect to after sign in process completes
+  // Redirect to home page
   return NextResponse.redirect(`${origin}/`)
 }
 

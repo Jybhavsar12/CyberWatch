@@ -3,11 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { createClient } from '@/lib/supabase/client'
 import { ArrowRight, Lock, Mail, Newspaper, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 
 // Force dynamic rendering (no static generation)
 export const dynamic = 'force-dynamic'
@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,12 +25,16 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const result = await signIn('credentials', {
         email,
         password,
+        redirect: false,
       })
 
-      if (error) throw error
+      if (result?.error) {
+        setError('Invalid email or password')
+        return
+      }
 
       router.push('/')
       router.refresh()
@@ -43,15 +46,12 @@ export default function LoginPage() {
   }
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      setError(error.message)
+    try {
+      await signIn('google', {
+        callbackUrl: '/',
+      })
+    } catch (error: any) {
+      setError(error.message || 'Failed to login with Google')
     }
   }
 

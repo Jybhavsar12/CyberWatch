@@ -3,11 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { createClient } from '@/lib/supabase/client'
 import { ArrowRight, Lock, Mail, Newspaper, Shield, User } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 
 // Force dynamic rendering (no static generation)
 export const dynamic = 'force-dynamic'
@@ -20,7 +20,6 @@ export default function SignupPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,20 +27,33 @@ export default function SignupPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+      // Call signup API
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName }),
       })
 
-      if (error) throw error
+      const data = await response.json()
 
-      setSuccess(true)
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sign up')
+      }
+
+      // Auto sign in after successful signup
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Account created but failed to sign in. Please try logging in.')
+        return
+      }
+
+      router.push('/')
+      router.refresh()
     } catch (error: any) {
       setError(error.message || 'Failed to sign up')
     } finally {
@@ -50,44 +62,13 @@ export default function SignupPage() {
   }
 
   const handleGoogleSignup = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    if (error) {
-      setError(error.message)
+    try {
+      await signIn('google', {
+        callbackUrl: '/',
+      })
+    } catch (error: any) {
+      setError(error.message || 'Failed to sign up with Google')
     }
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center p-6">
-        <Card className="w-full max-w-md border-black/10 dark:border-white/10 bg-white dark:bg-black">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold tracking-tight text-black dark:text-white">Check Your Email</CardTitle>
-            <CardDescription className="text-black/60 dark:text-white/60">
-              We've sent you a confirmation link to <strong>{email}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-black/60 dark:text-white/60">
-              Click the link in the email to verify your account and start using CyberWatch.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button
-              onClick={() => router.push('/login')}
-              className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90"
-            >
-              GO TO LOGIN
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    )
   }
 
   return (

@@ -1,6 +1,6 @@
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db/neon'
 import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes } from 'crypto'
 
@@ -22,23 +22,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
-    
     // Generate unsubscribe token
     const unsubscribeToken = randomBytes(32).toString('hex')
 
     // Insert subscriber
-    const { error } = await supabase
-      .from('newsletter_subscribers')
-      .insert({
-        email: email.toLowerCase(),
-        unsubscribe_token: unsubscribeToken,
-        active: true,
-      })
-
-    if (error) {
-      // Check if already subscribed
-      if (error.code === '23505') { // Unique violation
+    try {
+      await sql`
+        INSERT INTO newsletter_subscribers (email, unsubscribe_token, active)
+        VALUES (${email.toLowerCase()}, ${unsubscribeToken}, ${true})
+      `
+    } catch (error: any) {
+      // Check if already subscribed (unique constraint violation)
+      if (error.code === '23505') {
         return NextResponse.json(
           { error: 'This email is already subscribed' },
           { status: 400 }

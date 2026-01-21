@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db/neon'
+import { getSession } from '@/lib/auth'
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
 
@@ -10,20 +11,35 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient()
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const session = await getSession()
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: savedArticles, error } = await supabase
-      .from('saved_articles')
-      .select('*, articles(*)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
+    // Fetch saved articles with article details using JOIN
+    const savedArticles = await sql`
+      SELECT
+        sa.id,
+        sa.user_id,
+        sa.article_id,
+        sa.created_at,
+        a.id as article_id,
+        a.title,
+        a.description,
+        a.content,
+        a.url,
+        a.image_url,
+        a.source,
+        a.category,
+        a.published_at,
+        a.author,
+        a.tags
+      FROM saved_articles sa
+      JOIN articles a ON sa.article_id = a.id
+      WHERE sa.user_id = ${session.user.id}
+      ORDER BY sa.created_at DESC
+    `
 
     const response = NextResponse.json({ savedArticles })
     return addSecurityHeaders(response)
@@ -44,25 +60,22 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient()
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const session = await getSession()
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
     const { articleId } = body
 
-    const { data, error } = await supabase
-      .from('saved_articles')
-      .insert({ user_id: user.id, article_id: articleId })
-      .select()
-      .single()
+    const result = await sql`
+      INSERT INTO saved_articles (user_id, article_id)
+      VALUES (${session.user.id}, ${articleId})
+      RETURNING *
+    `
 
-    if (error) throw error
-
-    const response = NextResponse.json({ savedArticle: data })
+    const response = NextResponse.json({ savedArticle: result[0] })
     return addSecurityHeaders(response)
   } catch (error) {
     console.error('Error saving article:', error)
@@ -81,23 +94,20 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient()
-    
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const session = await getSession()
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
     const articleId = searchParams.get('articleId')
 
-    const { error } = await supabase
-      .from('saved_articles')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('article_id', articleId)
-
-    if (error) throw error
+    await sql`
+      DELETE FROM saved_articles
+      WHERE user_id = ${session.user.id}
+      AND article_id = ${articleId}
+    `
 
     const response = NextResponse.json({ success: true })
     return addSecurityHeaders(response)

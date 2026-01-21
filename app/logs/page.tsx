@@ -3,12 +3,12 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createClient } from '@/lib/supabase/client'
 import { formatDistanceToNow } from 'date-fns'
 import { Mail, MessageSquare, RefreshCw, Shield, TrendingUp, User, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 
 interface UserData {
   authUsers: any[]
@@ -26,9 +26,8 @@ export default function LogsPage() {
   const [data, setData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
   const router = useRouter()
-  const supabase = createClient()
 
   const fetchData = async () => {
     setLoading(true)
@@ -61,21 +60,18 @@ export default function LogsPage() {
   }
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      if (user) {
-        fetchData()
-      } else {
-        setLoading(false)
-        setError('Please sign in to access this page')
-      }
+    if (status === 'loading') return
+
+    if (session?.user) {
+      fetchData()
+    } else {
+      setLoading(false)
+      setError('Please sign in to access this page')
     }
-    checkUser()
-  }, [])
+  }, [session, status])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
+    await signOut({ redirect: false })
     router.push('/')
   }
 

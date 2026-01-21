@@ -37,6 +37,10 @@ yarn-error.log*
 *.sql
 supabase/schema.sql
 
+# migration scripts (local only)
+/scripts/
+/lib/db/migrate.ts
+
 # vercel
 .vercel
 

@@ -6,33 +6,23 @@ import { NewsletterSignup } from '@/components/newsletter-signup';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
-import { createClient } from '@/lib/supabase/client';
 import { Lock, Newspaper, Shield, TrendingUp, User, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null)
+  const { data: session, status } = useSession()
+  const user = session?.user
   const router = useRouter()
-  const supabase = createClient()
   const heroAnimation = useScrollAnimation({ threshold: 0.2 })
   const feedAnimation = useScrollAnimation({ threshold: 0.1 })
 
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-  }
-
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
+    await signOut({ redirect: false })
     router.refresh()
   }
-
-  useEffect(() => {
-    checkUser()
-  }, [checkUser])
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors">

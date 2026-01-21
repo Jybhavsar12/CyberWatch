@@ -1,6 +1,7 @@
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { createAdminClient, createClient } from '@/lib/supabase/server'
+import { sql } from '@/lib/db/neon'
+import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -11,12 +12,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createClient()
+    const session = await getSession()
 
     // Check if user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
+    if (!session?.user?.email) {
       return NextResponse.json(
         { error: 'Unauthorized - Please sign in to access this page' },
         { status: 401 }
@@ -26,59 +25,61 @@ export async function GET(request: NextRequest) {
     // Check if user is admin (whitelist check)
     const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim().toLowerCase()) || []
 
-    if (!adminEmails.includes(user.email?.toLowerCase() || '')) {
+    if (!adminEmails.includes(session.user.email.toLowerCase())) {
       return NextResponse.json(
         { error: 'Forbidden - Admin access only' },
         { status: 403 }
       )
     }
 
-    // Use admin client to fetch all users
-    const adminClient = createAdminClient()
-
-    // Fetch authenticated users from Supabase Auth (using admin API)
-    const { data: { users: authUsers }, error: usersError } = await adminClient.auth.admin.listUsers()
+    // Fetch all users from database
+    const authUsers = await sql`
+      SELECT id, email, full_name, created_at, updated_at
+      FROM users
+      ORDER BY created_at DESC
+    `
 
     // Fetch user preferences
-    const { data: userPreferences, error: prefsError } = await supabase
-      .from('user_preferences')
-      .select('*')
+    const userPreferences = await sql`
+      SELECT * FROM user_preferences
+    `
 
     // Fetch newsletter subscribers
-    const { data: subscribers, error: subscribersError } = await supabase
-      .from('newsletter_subscribers')
-      .select('*')
-      .order('subscribed_at', { ascending: false })
+    const subscribers = await sql`
+      SELECT * FROM newsletter_subscribers
+      ORDER BY subscribed_at DESC
+    `
 
     // Fetch article comments to get user activity
-    const { data: comments, error: commentsError } = await supabase
-      .from('article_comments')
-      .select('user_id, user_name, user_email, created_at')
-      .order('created_at', { ascending: false })
-      .limit(100)
+    const comments = await sql`
+      SELECT user_id, user_name, user_email, created_at
+      FROM article_comments
+      ORDER BY created_at DESC
+      LIMIT 100
+    `
 
     // Combine auth users with their preferences
-    const usersWithPreferences = authUsers?.map(authUser => {
-      const prefs = userPreferences?.find(p => p.user_id === authUser.id)
+    const usersWithPreferences = authUsers.map(authUser => {
+      const prefs = userPreferences.find(p => p.user_id === authUser.id)
       return {
         id: authUser.id,
         email: authUser.email,
+        full_name: authUser.full_name,
         created_at: authUser.created_at,
-        last_sign_in_at: authUser.last_sign_in_at,
-        email_confirmed_at: authUser.email_confirmed_at,
+        updated_at: authUser.updated_at,
         preferences: prefs || null
       }
-    }) || []
+    })
 
     const response = NextResponse.json({
       authUsers: usersWithPreferences,
-      subscribers: subscribers || [],
-      recentActivity: comments || [],
+      subscribers: subscribers,
+      recentActivity: comments,
       stats: {
         totalAuthUsers: usersWithPreferences.length,
-        totalSubscribers: subscribers?.length || 0,
-        activeSubscribers: subscribers?.filter(s => s.active).length || 0,
-        recentComments: comments?.length || 0,
+        totalSubscribers: subscribers.length,
+        activeSubscribers: subscribers.filter(s => s.active).length,
+        recentComments: comments.length,
       }
     })
 

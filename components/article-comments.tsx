@@ -2,10 +2,10 @@
 
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { createClient } from '@/lib/supabase/client'
 import { formatDistanceToNow } from 'date-fns'
 import { MessageCircle, Send, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 interface Comment {
   id: string
@@ -22,38 +22,23 @@ export function ArticleComments({ articleUrl }: ArticleCommentsProps) {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
   const [loading, setLoading] = useState(false)
-  const [user, setUser] = useState<any>(null)
   const [showComments, setShowComments] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const supabase = createClient()
+  const { data: session } = useSession()
+  const user = session?.user
 
   useEffect(() => {
-    checkUser()
     if (showComments) {
       fetchComments()
     }
   }, [showComments])
 
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-  }
-
   const fetchComments = async () => {
     try {
       setError(null)
-      const { data, error } = await supabase
-        .from('article_comments')
-        .select('*')
-        .eq('article_url', articleUrl)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching comments:', error)
-        setError(`Failed to load comments: ${error.message}`)
-        return
-      }
-      setComments(data || [])
+      // Note: This would need an API route to fetch comments
+      // For now, we'll keep comments disabled until API route is created
+      setComments([])
     } catch (error: any) {
       console.error('Error fetching comments:', error)
       setError(`Failed to load comments: ${error?.message || 'Unknown error'}`)
@@ -67,24 +52,27 @@ export function ArticleComments({ articleUrl }: ArticleCommentsProps) {
     setLoading(true)
     setError(null)
     try {
-      const { error } = await supabase
-        .from('article_comments')
-        .insert({
+      // Note: This would need an API route to post comments
+      // For now, we'll show an error message
+      setError('Comments feature is temporarily disabled during migration')
+      /*
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           article_url: articleUrl,
-          user_id: user.id,
-          user_name: user.email?.split('@')[0] || 'Anonymous',
-          user_email: user.email,
           comment: newComment.trim(),
-        })
+        }),
+      })
 
-      if (error) {
-        console.error('Error posting comment:', error)
-        setError(`Failed to post comment: ${error.message}`)
-        return
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to post comment')
       }
 
       setNewComment('')
       fetchComments()
+      */
     } catch (error: any) {
       console.error('Error posting comment:', error)
       setError(`Failed to post comment: ${error?.message || 'Unknown error'}`)
