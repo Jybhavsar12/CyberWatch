@@ -29,16 +29,17 @@ export function NewsCard({ article, index = 0 }: NewsCardProps) {
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 })
   const cardRef = useRef<HTMLDivElement>(null)
 
-  // Mouse position tracking for 3D tilt effect
+  // Mouse position tracking for 3D tilt effect (desktop only)
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  // Smooth spring animations
+  // Smooth spring animations (desktop only)
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), { stiffness: 300, damping: 30 })
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), { stiffness: 300, damping: 30 })
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
+    // Only enable 3D tilt on desktop (viewport width > 1024px)
+    if (!cardRef.current || window.innerWidth < 1024) return
 
     const rect = cardRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
