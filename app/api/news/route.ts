@@ -1,7 +1,7 @@
+import { sql } from '@/lib/db/neon'
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
 import { fetchNewsFromRSS } from '@/lib/services/news-aggregator'
-import { sql } from '@/lib/db/neon'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Enable edge runtime for better performance
@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
               category, published_at, author, tags
             )
             VALUES (
-              ${article.title}, ${article.description}, ${article.content},
-              ${article.url}, ${article.imageUrl}, ${article.source},
-              ${article.category}, ${article.publishedAt}, ${article.author},
+              ${article.title}, ${article.description}, ${null},
+              ${article.url}, ${article.image_url}, ${article.source},
+              ${article.category}, ${article.published_at}, ${article.author},
               ${article.tags}
             )
             ON CONFLICT (url) DO NOTHING

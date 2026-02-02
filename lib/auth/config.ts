@@ -1,16 +1,12 @@
+import { sql } from '@/lib/db/neon'
+import bcrypt from 'bcryptjs'
 import { NextAuthConfig } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
-import bcrypt from 'bcryptjs'
-import { sql } from '@/lib/db/neon'
 
-export const authConfig: NextAuthConfig = {
-  providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    Credentials({
+// Only include Google provider if credentials are set
+const providers: any[] = [
+  Credentials({
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
@@ -49,7 +45,20 @@ export const authConfig: NextAuthConfig = {
         }
       },
     }),
-  ],
+]
+
+// Add Google provider only if credentials are configured
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  )
+}
+
+export const authConfig: NextAuthConfig = {
+  providers,
   callbacks: {
     async signIn({ user, account, profile }) {
       // Handle Google OAuth sign-in
