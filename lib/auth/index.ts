@@ -29,13 +29,13 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function createUser(email: string, password: string, fullName?: string) {
   const passwordHash = await hashPassword(password)
-  
+
   const result = await sql`
     INSERT INTO users (email, password_hash, full_name)
     VALUES (${email.toLowerCase()}, ${passwordHash}, ${fullName || ''})
     RETURNING id, email, full_name, created_at
-  `
-  
+  ` as any[]
+
   return result[0]
 }
 
@@ -44,8 +44,8 @@ export async function getUserByEmail(email: string) {
     SELECT id, email, full_name, created_at
     FROM users
     WHERE email = ${email.toLowerCase()}
-  `
-  
+  ` as any[]
+
   return users[0] || null
 }
 
@@ -54,8 +54,8 @@ export async function getUserById(id: string) {
     SELECT id, email, full_name, created_at
     FROM users
     WHERE id = ${id}
-  `
-  
+  ` as any[]
+
   return users[0] || null
 }
 
