@@ -123,7 +123,7 @@ export default function LogsPage() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 px-3 py-1.5 bg-black/5 dark:bg-white/5 rounded border border-black/10 dark:border-white/10">
                 <User className="h-4 w-4 text-black dark:text-white" />
-                <span className="text-xs text-black dark:text-white">{user.email}</span>
+                <span className="text-xs text-black dark:text-white">{session?.user?.email}</span>
               </div>
               <Button onClick={handleSignOut} variant="outline" size="sm">
                 Sign Out
