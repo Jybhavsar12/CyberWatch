@@ -5,10 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatDistanceToNow } from 'date-fns'
 import { Mail, MessageSquare, RefreshCw, Shield, TrendingUp, User, Users } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
 
 interface UserData {
   authUsers: any[]
@@ -86,7 +86,7 @@ export default function LogsPage() {
     )
   }
 
-  if (error || !user) {
+  if (error || !session?.user) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <Card className="max-w-md w-full mx-4">
