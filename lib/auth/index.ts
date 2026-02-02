@@ -1,10 +1,13 @@
-import { getServerSession } from 'next-auth'
-import { authConfig } from './config'
-import bcrypt from 'bcryptjs'
 import { sql } from '@/lib/db/neon'
+import bcrypt from 'bcryptjs'
+import NextAuth from 'next-auth'
+import { authConfig } from './config'
+
+// Create auth instance for NextAuth v5
+export const { auth, handlers, signIn, signOut } = NextAuth(authConfig)
 
 export async function getSession() {
-  return await getServerSession(authConfig)
+  return await auth()
 }
 
 export async function getCurrentUser() {
