@@ -23,7 +23,7 @@ const providers: any[] = [
         // Find user in database
         const users = await sql`
           SELECT * FROM users WHERE email = ${email.toLowerCase()}
-        `
+        ` as any[]
 
         const user = users[0]
 
@@ -67,7 +67,7 @@ export const authConfig: NextAuthConfig = {
           // Check if user exists
           const existingUsers = await sql`
             SELECT * FROM users WHERE email = ${profile.email.toLowerCase()}
-          `
+          ` as any[]
 
           if (existingUsers.length === 0) {
             // Create new user for Google OAuth
