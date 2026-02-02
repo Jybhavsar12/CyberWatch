@@ -1,6 +1,6 @@
+import { sql } from '@/lib/db/neon'
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { sql } from '@/lib/db/neon'
 import { searchQuerySchema } from '@/lib/validations/article'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build SQL query
-    let articles
+    let articles: any[]
     if (category && category !== 'all') {
       articles = await sql`
         SELECT * FROM articles
@@ -37,14 +37,14 @@ export async function GET(request: NextRequest) {
         AND category = ${category}
         ORDER BY published_at DESC
         LIMIT 50
-      `
+      ` as any[]
     } else {
       articles = await sql`
         SELECT * FROM articles
         WHERE title ILIKE ${'%' + query + '%'} OR description ILIKE ${'%' + query + '%'}
         ORDER BY published_at DESC
         LIMIT 50
-      `
+      ` as any[]
     }
 
     const response = NextResponse.json({ articles, count: articles?.length || 0 })
