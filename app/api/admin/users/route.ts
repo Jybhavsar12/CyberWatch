@@ -1,7 +1,7 @@
+import { getSession } from '@/lib/auth'
+import { sql } from '@/lib/db/neon'
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
-import { sql } from '@/lib/db/neon'
-import { getSession } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -37,18 +37,18 @@ export async function GET(request: NextRequest) {
       SELECT id, email, full_name, created_at, updated_at
       FROM users
       ORDER BY created_at DESC
-    `
+    ` as any[]
 
     // Fetch user preferences
     const userPreferences = await sql`
       SELECT * FROM user_preferences
-    `
+    ` as any[]
 
     // Fetch newsletter subscribers
     const subscribers = await sql`
       SELECT * FROM newsletter_subscribers
       ORDER BY subscribed_at DESC
-    `
+    ` as any[]
 
     // Fetch article comments to get user activity
     const comments = await sql`
@@ -56,11 +56,11 @@ export async function GET(request: NextRequest) {
       FROM article_comments
       ORDER BY created_at DESC
       LIMIT 100
-    `
+    ` as any[]
 
     // Combine auth users with their preferences
-    const usersWithPreferences = authUsers.map(authUser => {
-      const prefs = userPreferences.find(p => p.user_id === authUser.id)
+    const usersWithPreferences = authUsers.map((authUser: any) => {
+      const prefs = userPreferences.find((p: any) => p.user_id === authUser.id)
       return {
         id: authUser.id,
         email: authUser.email,
