@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { sql } from '@/lib/db/neon'
 import { getSession } from '@/lib/auth'
+import { sql } from '@/lib/db/neon'
 import { rateLimit } from '@/lib/middleware/rate-limit'
 import { addSecurityHeaders } from '@/lib/middleware/security'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   const rateLimitResult = rateLimit(request, 30, 60000)
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       JOIN articles a ON sa.article_id = a.id
       WHERE sa.user_id = ${session.user.id}
       ORDER BY sa.created_at DESC
-    `
+    ` as any[]
 
     const response = NextResponse.json({ savedArticles })
     return addSecurityHeaders(response)
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       INSERT INTO saved_articles (user_id, article_id)
       VALUES (${session.user.id}, ${articleId})
       RETURNING *
-    `
+    ` as any[]
 
     const response = NextResponse.json({ savedArticle: result[0] })
     return addSecurityHeaders(response)
