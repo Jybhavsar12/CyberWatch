@@ -1,53 +1,22 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { formatDistanceToNow } from 'date-fns'
-import { MessageCircle, Send, User } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-
-interface Comment {
-  id: string
-  user_name: string
-  comment: string
-  created_at: string
-}
+import { MessageCircle } from 'lucide-react'
 
 interface ArticleCommentsProps {
   articleUrl: string
 }
 
 export function ArticleComments({ articleUrl }: ArticleCommentsProps) {
-  const [comments, setComments] = useState<Comment[]>([])
-  const [newComment, setNewComment] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [showComments, setShowComments] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const { data: session } = useSession()
-  const user = session?.user
-
-  useEffect(() => {
-    if (showComments) {
-      fetchComments()
-    }
-  }, [showComments])
-
-  const fetchComments = async () => {
-    try {
-      setError(null)
-      // Note: This would need an API route to fetch comments
-      // For now, we'll keep comments disabled until API route is created
-      setComments([])
-    } catch (error: any) {
-      console.error('Error fetching comments:', error)
-      setError(`Failed to load comments: ${error?.message || 'Unknown error'}`)
-    }
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newComment.trim() || !user) return
+  // Comments feature temporarily disabled during migration from Supabase to Neon
+  return (
+    <div className="border-t border-black/10 dark:border-white/10 pt-4">
+      <div className="flex items-center gap-2 text-black/40 dark:text-white/40">
+        <MessageCircle className="h-4 w-4" />
+        <span className="text-xs sm:text-sm">Comments temporarily disabled during migration</span>
+      </div>
+    </div>
+  )
+}
 
     setLoading(true)
     setError(null)
