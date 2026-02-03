@@ -25,9 +25,11 @@ export function NewsFeed() {
   const [searchQuery, setSearchQuery] = useState('')
   const [category, setCategory] = useState<'all' | 'tech' | 'cybersecurity'>('all')
   const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchNews = useCallback(async (forceRefresh = false) => {
     setLoading(true)
+    setError(null)
     try {
       // Add cache-busting parameter when force refreshing
       const cacheBuster = forceRefresh ? `&t=${Date.now()}` : ''
@@ -35,10 +37,17 @@ export function NewsFeed() {
         // Force no-cache when refreshing
         cache: forceRefresh ? 'no-store' : 'default'
       })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
+      console.log('Fetched articles:', data.articles?.length || 0)
       setArticles(data.articles || [])
     } catch (error) {
       console.error('Error fetching news:', error)
+      setError(error instanceof Error ? error.message : 'Failed to load news')
     } finally {
       setLoading(false)
       setRefreshing(false)
