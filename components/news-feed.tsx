@@ -140,6 +140,22 @@ export function NewsFeed() {
         </TabsList>
       </Tabs>
 
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg mb-6">
+          <p className="text-sm font-medium">Error loading news</p>
+          <p className="text-xs mt-1">{error}</p>
+          <Button
+            onClick={() => fetchNews(true)}
+            size="sm"
+            variant="outline"
+            className="mt-3 text-xs"
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
+
       {/* Articles Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -151,7 +167,7 @@ export function NewsFeed() {
             />
           ))}
         </div>
-      ) : (
+      ) : !error ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {articles.map((article, index) => (
             <NewsCard
@@ -161,10 +177,10 @@ export function NewsFeed() {
             />
           ))}
         </div>
-      )}
+      ) : null}
 
       {/* Empty State */}
-      {!loading && articles.length === 0 && (
+      {!loading && !error && articles.length === 0 && (
         <div className="text-center py-12 sm:py-20 border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 rounded-lg">
           <Filter className="h-10 w-10 sm:h-12 sm:w-12 text-black/20 dark:text-white/20 mx-auto mb-3 sm:mb-4" />
           <p className="text-black/40 dark:text-white/40 text-xs sm:text-sm tracking-wide">NO INTELLIGENCE FOUND</p>
