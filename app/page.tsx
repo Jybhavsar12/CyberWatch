@@ -5,13 +5,21 @@ import { NewsFeed } from '@/components/news-feed';
 import { NewsletterSignup } from '@/components/newsletter-signup';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { GlowingEffectDemo } from '@/components/glowing-effect-demo';
 import { useScrollAnimation } from '@/hooks/use-scroll-animation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Lock, Newspaper, Shield, TrendingUp, User, Zap } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useRef } from 'react';
+
+// Lazy load the shader background for faster initial page load
+const ShaderBackground = dynamic(
+  () => import('@/components/ui/animated-shader-hero').then(mod => ({ default: mod.ShaderBackground })),
+  { ssr: false }
+);
 
 export default function Home() {
   const { data: session } = useSession()
@@ -125,7 +133,7 @@ export default function Home() {
         </div>
       </motion.header>
 
-      {/* Hero Section with Advanced Parallax */}
+      {/* Hero Section with Animated Shader Background */}
       <motion.section
         ref={heroAnimation.ref}
         className="bg-black dark:bg-white text-white dark:text-black py-16 sm:py-24 md:py-32 border-b border-white/10 dark:border-black/10 overflow-hidden relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] flex items-center"
@@ -135,52 +143,8 @@ export default function Home() {
           y: heroY
         }}
       >
-        {/* Multi-layered Parallax Background Elements */}
-        <Parallax speed={-5} className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-10 sm:top-20 left-5 sm:left-10 w-64 h-64 sm:w-96 sm:h-96 bg-purple-500/20 dark:bg-purple-500/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        </Parallax>
-
-        <Parallax speed={-3} className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute bottom-10 sm:bottom-20 right-5 sm:right-10 w-80 h-80 sm:w-[500px] sm:h-[500px] bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: 1,
-            }}
-          />
-        </Parallax>
-
-        <Parallax speed={-1} className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 sm:w-[600px] sm:h-[600px] bg-cyan-500/10 dark:bg-cyan-500/5 rounded-full blur-3xl"
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-          />
-        </Parallax>
+        {/* Animated Shader Background */}
+        <ShaderBackground className="dark:opacity-20" />
 
         {/* Floating Decorative Elements with Stagger */}
         <Floating duration={4} yOffset={15} className="absolute top-10 right-20 pointer-events-none hidden lg:block">
@@ -226,9 +190,9 @@ export default function Home() {
             </motion.div>
 
             {/* Title with Parallax */}
-            <Parallax speed={1}>
+            <Parallax speed={0.5}>
               <motion.h2
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 sm:mb-8 tracking-tight leading-tight"
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-8 sm:mb-10 md:mb-12 tracking-tight leading-tight"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
@@ -241,7 +205,7 @@ export default function Home() {
             </Parallax>
 
             <motion.p
-              className="text-base sm:text-lg md:text-xl text-white/70 dark:text-black/70 max-w-2xl leading-relaxed mt-4"
+              className="text-base sm:text-lg md:text-xl text-white/70 dark:text-black/70 max-w-2xl leading-relaxed mt-6 sm:mt-8"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -343,6 +307,9 @@ export default function Home() {
           <NewsFeed />
         </motion.div>
       </main>
+
+      {/* Glowing Effect Demo - Features Section */}
+      <GlowingEffectDemo />
 
       {/* Newsletter Signup */}
       <NewsletterSignup />
