@@ -17,19 +17,8 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: process.env.NODE_ENV === 'development',
   },
 
-  // Optimize webpack for faster builds
-  webpack: (config, { dev, isServer }) => {
-    if (dev && !isServer) {
-      // Reduce bundle size in dev
-      config.optimization = {
-        ...config.optimization,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
-        splitChunks: false,
-      };
-    }
-    return config;
-  },
+  // Empty turbopack config to silence the warning
+  turbopack: {},
 
   images: {
     remotePatterns: [
